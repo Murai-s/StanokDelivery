@@ -23,5 +23,5 @@ public class Delivery {
 
     private String status; // Статус заявки (CREATE, IN_DELIVERY, DELIVERED, CANCELED)
     private LocalDateTime createdAt; // Время создания заявки на доставку
-    // private LocalDateTime statusChangedAt; // Время смены статуса заявки
+    private LocalDateTime statusChangedAt; // Время смены статуса заявки
 }
