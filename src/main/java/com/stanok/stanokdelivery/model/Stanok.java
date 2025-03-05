@@ -1,6 +1,8 @@
 package com.stanok.stanokdelivery.model;
 
 import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -14,13 +16,11 @@ import java.util.UUID;
 public class Stanok {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id; // Айдишник станка
 
     private String name; // Название станка
     private String manufacturer; // Производитель станка
     private Double price; // Цена станка
 
-    public Stanok() {
-        this.id = UUID.randomUUID();
-    }
 }
