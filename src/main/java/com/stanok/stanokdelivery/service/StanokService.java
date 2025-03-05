@@ -8,14 +8,19 @@ import org.springframework.stereotype.Service;
 public class StanokService {
 
     private final StanokRepository stanokRepository;
+    private final DeliveryService deliveryService;
 
-    public StanokService(StanokRepository stanokRepository) {
+    public StanokService(StanokRepository stanokRepository, DeliveryService deliveryService) {
         this.stanokRepository = stanokRepository;
+        this.deliveryService = deliveryService;
     }
 
-    // Создание станка
-    public Stanok createStanok(Stanok stanok) {
-        return stanokRepository.save(stanok);
+    // Добавление станка в БД
+    public void addStanok(Stanok stanok) {
+
+        Stanok savedStanok = stanokRepository.save(stanok);
+
+        deliveryService.addDelivery(savedStanok);
     }
 
 }

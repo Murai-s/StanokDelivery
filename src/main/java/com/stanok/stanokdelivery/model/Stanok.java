@@ -12,6 +12,7 @@ import java.util.UUID;
 
 @Setter
 @Getter
+@NoArgsConstructor
 @Entity
 public class Stanok {
 
