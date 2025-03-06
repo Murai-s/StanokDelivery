@@ -3,17 +3,13 @@ package com.stanok.stanokdelivery.service;
 import com.stanok.stanokdelivery.model.Delivery;
 import com.stanok.stanokdelivery.model.Stanok;
 import com.stanok.stanokdelivery.repository.DeliveryRepository;
-import org.springframework.boot.CommandLineRunner;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
-import java.time.Duration;
 import java.util.UUID;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 
 import java.time.LocalDateTime;
-import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 @Service
