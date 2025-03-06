@@ -3,16 +3,26 @@ package com.stanok.stanokdelivery.service;
 import com.stanok.stanokdelivery.model.Delivery;
 import com.stanok.stanokdelivery.model.Stanok;
 import com.stanok.stanokdelivery.repository.DeliveryRepository;
+import org.springframework.boot.CommandLineRunner;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
+import java.time.Duration;
+import java.util.UUID;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 @Service
 public class DeliveryService {
 
     private final DeliveryRepository deliveryRepository;
+
+    // Пул из одного потока
+    private final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
 
     public DeliveryService(DeliveryRepository deliveryRepository) {
         this.deliveryRepository = deliveryRepository;
@@ -27,22 +37,27 @@ public class DeliveryService {
         delivery.setCreatedAt(LocalDateTime.now());
 
         deliveryRepository.save(delivery);
+
+        scheduleStatusChange(delivery.getId(), 20, TimeUnit.SECONDS);
     }
 
-    // Метод вызывается каждую секунду и проверяет статус заявки
-    @Scheduled(fixedRate = 1000)
-    public void checkAndCanceledDeliveries() {
+    private void scheduleStatusChange(UUID deliveryId, long delay, TimeUnit unit) {
 
-        List<Delivery> deliveries = deliveryRepository.findByStatus("CREATE");
+        scheduler.schedule(() -> {
 
-        for (Delivery delivery : deliveries) {
-            if (delivery.getCreatedAt().plusSeconds(10).isBefore(LocalDateTime.now())) {
+            Delivery delivery = deliveryRepository.findById(deliveryId)
+                    .orElseThrow(() -> new RuntimeException("Delivery not found"));
+
+            if (delivery.getStatus().equals("CREATE")) {
                 delivery.setStatus("CANCELED");
                 delivery.setStatusChangedAt(LocalDateTime.now());
                 deliveryRepository.save(delivery);
             }
-        }
+        }, delay, unit);
     }
+
+
+
 
     // todo
     public Delivery changeDeliveryStatus() {
