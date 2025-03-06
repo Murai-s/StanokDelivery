@@ -3,8 +3,11 @@ package com.stanok.stanokdelivery.service;
 import com.stanok.stanokdelivery.model.Delivery;
 import com.stanok.stanokdelivery.model.Stanok;
 import com.stanok.stanokdelivery.repository.DeliveryRepository;
+import jakarta.annotation.PostConstruct;
 import org.springframework.stereotype.Service;
 
+import java.time.Duration;
+import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -13,7 +16,7 @@ import java.time.LocalDateTime;
 import java.util.concurrent.TimeUnit;
 
 @Service
-public class DeliveryService {
+public class DeliveryService{
 
     private final DeliveryRepository deliveryRepository;
 
@@ -52,7 +55,28 @@ public class DeliveryService {
         }, delay, unit);
     }
 
+    @PostConstruct
+    public void restoreTimers() {
 
+        // Список заявок со статусом CREATE
+        List<Delivery> deliveriesWithCreateStatus = deliveryRepository.findByStatus("CREATE");
+
+        for (Delivery delivery : deliveriesWithCreateStatus) {
+            LocalDateTime now = LocalDateTime.now();
+            LocalDateTime createdAt = delivery.getCreatedAt(); // Время создания заявки
+            LocalDateTime cancelTime = createdAt.plusSeconds(20); // Время когда заявка должна отмениться
+
+            if (cancelTime.isAfter(now)) {
+                long remainingTime = Duration.between(now, cancelTime).toSeconds(); // Остаток времени в сек
+                scheduleStatusChange(delivery.getId(), remainingTime, TimeUnit.SECONDS);
+            } else {
+                // Если время уже истекло
+                delivery.setStatus("CANCELED");
+                delivery.setStatusChangedAt(now);
+                deliveryRepository.save(delivery);
+            }
+        }
+    }
 
 
     // todo
