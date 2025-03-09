@@ -16,11 +16,11 @@ public class StanokService {
     }
 
     // Добавление станка в БД
-    public void addStanok(Stanok stanok) {
+    public Stanok addStanok(Stanok stanok) {
 
         Stanok savedStanok = stanokRepository.save(stanok);
-
         deliveryService.addDelivery(savedStanok);
+        return savedStanok;
     }
 
 }

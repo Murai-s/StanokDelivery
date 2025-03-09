@@ -24,9 +24,8 @@ public class StanokController {
     @PostMapping("/stanok.create")
     public ResponseEntity<String> addStanok(@RequestBody Stanok stanok) {
 
-        stanokService.addStanok(stanok);
-
-        return ResponseEntity.ok("Stanok with ID " + stanok.getId() + " successfully added!");
+        Stanok savedStanok = stanokService.addStanok(stanok);
+        return ResponseEntity.ok("Stanok with ID " + savedStanok.getId() + " successfully added!");
     }
 
 

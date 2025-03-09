@@ -21,7 +21,7 @@ public class DeliveryService{
     private final DeliveryRepository deliveryRepository;
 
     // Пул из одного потока
-    private final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
+    private final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(3);
 
     public DeliveryService(DeliveryRepository deliveryRepository) {
         this.deliveryRepository = deliveryRepository;
