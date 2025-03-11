@@ -37,10 +37,12 @@ public class DeliveryService{
 
         deliveryRepository.save(delivery);
 
-        scheduleStatusChange(delivery.getId(), 20, TimeUnit.SECONDS);
+        // Метод который выполнится через 20 секунд и сменит статус заявки
+        scheduleStatusChange(delivery.getId(), 20);
     }
 
-    private void scheduleStatusChange(UUID deliveryId, long delay, TimeUnit unit) {
+    // Метод который изменит статус заявки спустя время
+    private void scheduleStatusChange(UUID deliveryId, long delay) {
 
         scheduler.schedule(() -> {
 
@@ -52,9 +54,10 @@ public class DeliveryService{
                 delivery.setStatusChangedAt(LocalDateTime.now());
                 deliveryRepository.save(delivery);
             }
-        }, delay, unit);
+        }, delay, TimeUnit.SECONDS);
     }
 
+    // При запуске сервера вызывает этот метод. Нужен для корректной работе таймера при перезапуске.
     @PostConstruct
     public void restoreTimers() {
 
@@ -62,13 +65,14 @@ public class DeliveryService{
         List<Delivery> deliveriesWithCreateStatus = deliveryRepository.findByStatus("CREATE");
 
         for (Delivery delivery : deliveriesWithCreateStatus) {
+
             LocalDateTime now = LocalDateTime.now();
             LocalDateTime createdAt = delivery.getCreatedAt(); // Время создания заявки
             LocalDateTime cancelTime = createdAt.plusSeconds(20); // Время когда заявка должна отмениться
 
             if (cancelTime.isAfter(now)) {
                 long remainingTime = Duration.between(now, cancelTime).toSeconds(); // Остаток времени в сек
-                scheduleStatusChange(delivery.getId(), remainingTime, TimeUnit.SECONDS);
+                scheduleStatusChange(delivery.getId(), remainingTime);
             } else {
                 // Если время уже истекло
                 delivery.setStatus("CANCELED");
